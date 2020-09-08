@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\UniqueCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UniqueCodeController extends Controller
 {
@@ -29,8 +30,20 @@ class UniqueCodeController extends Controller
         for ($i=0; $i < $request['count']; $i++) { 
             $c++;
             $b++;
-            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-            $randomnumber[] = substr(str_shuffle($permitted_chars), 0, 6);
+
+
+            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            // $randomnumber[] = substr(str_shuffle($permitted_chars), 0, 6);
+            $arrayNumber[substr(str_shuffle($permitted_chars), 0, 6)] = "";
+
+            $lastKey = base64_encode(openssl_random_pseudo_bytes(6));
+
+            $rand_str = '';
+            $desired_length = 6;
+            while(strlen($rand_str) < $desired_length)
+                $rand_str .= substr(str_shuffle($permitted_chars), 0, 1);
+
+            $randomnumber[] = $rand_str ;
             if ($c == "50000" ) {
                $this->curlToLumen($randomnumber);
                $randomnumber=array();
