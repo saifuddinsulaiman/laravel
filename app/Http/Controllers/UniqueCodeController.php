@@ -25,23 +25,22 @@ class UniqueCodeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   $c = 0;
-        $b = 0;
+    {   $c = 0; 
         $randomnumber=array();
         $permitted_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         $stringpieces = str_split($permitted_chars);
-        
-        for ($i=0; $i < $request['count']; $i++) { 
+        $b = $rowcount = $this->rowCount();
+
+        for ($i=$rowcount+1; $i <= $request['count']+$rowcount; $i++) { 
             $c++;
-            $b++;
+            $b++; 
 
             $tempnumber = substr(sprintf("%06d", $b), -5);
 
-            if ($tempnumber == 99999) {
-                next($stringpieces);
-            }
 
-            $number = current($stringpieces).$tempnumber;
+            $index =substr(sprintf("%07d", $i), 0, -5 );
+
+            $number = $stringpieces[(int)$index].$tempnumber;
             
             $pieces = str_split($number); 
 
@@ -50,20 +49,21 @@ class UniqueCodeController extends Controller
                     $pieces[$key] = substr(str_shuffle($permitted_chars), 0, 1);
                 }
             }
-
+            // echo $i." ".$tempnumber." ". implode("", $pieces)." ".$number;
             $randomnumber[] = implode("", $pieces);
-            if ($c == "50000" ) {
+            if ($c == "70000" ) {
                $this->curlToLumen($randomnumber);
                $randomnumber=array();
                $c = 0;
             }
 
         }
+        //call to API balance array
         if ($randomnumber) {
            $this->curlToLumen($randomnumber);
         }  
-
-        return response('Success insert '. $request['count']. ' data');
+        echo "<br>";
+        return response('Success insert '. $request['count'].' data');
     }
 
     public function curlToLumen($randomnumber=array())
@@ -89,4 +89,23 @@ class UniqueCodeController extends Controller
         return response('Success');
 
     }   
+
+
+    public function rowCount(){
+        $url = env("API_URL")."/uniquecode/count";
+  
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POST,0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // execute!
+        $response = curl_exec($ch);
+
+        // close the connection, release resources used
+        curl_close($ch);
+        return $response;
+
+    }
 }
