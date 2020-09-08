@@ -27,23 +27,24 @@ class UniqueCodeController extends Controller
     public function store(Request $request)
     {   $c = 0;
         $b = 0;
+        $randomnumber=array();
         for ($i=0; $i < $request['count']; $i++) { 
             $c++;
             $b++;
 
+            $number = sprintf("%06d", $b);
 
-            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            // $randomnumber[] = substr(str_shuffle($permitted_chars), 0, 6);
-            $arrayNumber[substr(str_shuffle($permitted_chars), 0, 6)] = "";
+            $permitted_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            $pieces = str_split($number); 
 
-            $lastKey = base64_encode(openssl_random_pseudo_bytes(6));
+            foreach ($pieces as $key => $value) {
+                if ((int)$value === (int)0) {
+                    $pieces[$key] = substr(str_shuffle($permitted_chars), 0, 1);
+                }
+            }
 
-            $rand_str = '';
-            $desired_length = 6;
-            while(strlen($rand_str) < $desired_length)
-                $rand_str .= substr(str_shuffle($permitted_chars), 0, 1);
-
-            $randomnumber[] = $rand_str ;
+            $randomnumber[] = implode("", $pieces);
             if ($c == "50000" ) {
                $this->curlToLumen($randomnumber);
                $randomnumber=array();
