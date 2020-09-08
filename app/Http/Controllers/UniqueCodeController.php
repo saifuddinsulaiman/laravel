@@ -28,18 +28,25 @@ class UniqueCodeController extends Controller
     {   $c = 0;
         $b = 0;
         $randomnumber=array();
+        $permitted_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        $stringpieces = str_split($permitted_chars);
+        
         for ($i=0; $i < $request['count']; $i++) { 
             $c++;
             $b++;
 
-            $number = sprintf("%06d", $b);
+            $tempnumber = substr(sprintf("%06d", $b), -5);
 
-            $permitted_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if ($tempnumber == 99999) {
+                next($stringpieces);
+            }
+
+            $number = current($stringpieces).$tempnumber;
             
             $pieces = str_split($number); 
 
             foreach ($pieces as $key => $value) {
-                if ((int)$value === (int)0) {
+                if ($value === "0") {
                     $pieces[$key] = substr(str_shuffle($permitted_chars), 0, 1);
                 }
             }
