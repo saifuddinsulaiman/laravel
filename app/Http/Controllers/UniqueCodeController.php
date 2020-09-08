@@ -51,7 +51,7 @@ class UniqueCodeController extends Controller
             }
             // echo $i." ".$tempnumber." ". implode("", $pieces)." ".$number;
             $randomnumber[] = implode("", $pieces);
-            if ($c == "70000" ) {
+            if ($c == "50000" ) {
                $this->curlToLumen($randomnumber);
                $randomnumber=array();
                $c = 0;
