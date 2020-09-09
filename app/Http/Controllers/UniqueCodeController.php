@@ -31,28 +31,16 @@ class UniqueCodeController extends Controller
         $stringpieces = str_split($permitted_chars);
         $b = $rowcount = $this->rowCount();
 
-        for ($i=$rowcount+1; $i <= $request['count']+$rowcount; $i++) { 
+        for ($i=0; $i < $request['count']; $i++) { 
             $c++;
             $b++; 
 
-            $tempnumber = substr(sprintf("%06d", $b), -5);
+            $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            $randomnumber[] = substr(str_shuffle($permitted_chars), 0, 6);
 
 
-            $index =substr(sprintf("%07d", $i), 0, -5 );
-
-            $number = $stringpieces[(int)$index].$tempnumber;
-            
-            $pieces = str_split($number); 
-
-            foreach ($pieces as $key => $value) {
-                if ($value === "0") {
-                    $pieces[$key] = substr(str_shuffle($permitted_chars), 0, 1);
-                }
-            }
-            // echo $i." ".$tempnumber." ". implode("", $pieces)." ".$number;
-            $randomnumber[] = implode("", $pieces);
             if ($c == "50000" ) {
-               $this->curlToLumen($randomnumber);
+               $this->curlToLumen($randomnumber,$request['count']);
                $randomnumber=array();
                $c = 0;
             }
@@ -60,9 +48,9 @@ class UniqueCodeController extends Controller
         }
         //call to API balance array
         if ($randomnumber) {
-           $this->curlToLumen($randomnumber);
+           $this->curlToLumen($randomnumber,$request['count']);
         }  
-        echo "<br>";
+        // echo "<br>";
         return response('Success insert '. $request['count'].' data');
     }
 
